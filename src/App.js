@@ -15,7 +15,7 @@ class App extends Component {
 
   nameChangedHandler = (event, id) => {
     const personIndex = this.state.persons.findIndex(p => {
-      return p.id == id;
+      return p.id === id;
     });
 
     // make copies, not references!
