@@ -5,35 +5,40 @@ import Person from './Person/Person';
 class App extends Component {
   state = {
     persons: [
-      { name: 'Alice', age: 21 },
-      { name: 'Beth', age: 29 },
-      { name: 'Charlie', age: 26 }
+      { id: 'gds873b3hiohuugiud', name: 'Alice', age: 21 },
+      { id: 'scn2f37g389iuhgbfu', name: 'Beth', age: 29 },
+      { id: '873ubidnidy9sdwkkl', name: 'Charlie', age: 26 }
     ],
     otherState: 'some other value',
     showPersons: false
   };
 
-
-  switchNameHandler = (newName) => {
-    // console.log('Was clicked!');
-    // DON'T DO THIS: this.state.persons[0].name = 'Maximilian';
-    this.setState({
-      persons: [
-        { name: newName, age: 28 },
-        { name: 'Bob', age: 29 },
-        { name: 'Cameron', age: 27 }
-      ]
+  nameChangedHandler = (event, id) => {
+    const personIndex = this.state.persons.findIndex(p => {
+      return p.id == id;
     });
-  };
 
-  nameChangedHandler = (event) => {
-    this.setState({
-      persons: [
-        { name: 'Alice', age: 28 },
-        { name: event.target.value, age: 29 },
-        { name: 'Cameron', age: 27 }
-      ]
-    });
+    // make copies, not references!
+    const person = {
+      ...this.state.persons[personIndex]
+    };
+
+    //alternative...
+    //const persons = Object.aassign({}, this.state.persons[personIndex]);
+
+    person.name = event.target.value;
+    
+    const persons = [...this.state.persons];
+    persons[personIndex] = person;
+
+    this.setState({persons: persons});
+  }
+
+  deletePersonHandler = (personIndex) => {
+    // make a copy, not a pointer
+    const persons = [...this.state.persons]
+    persons.splice(personIndex, 1);
+    this.setState({persons: persons});
   }
 
   togglePersonsHandler = () => {
@@ -41,6 +46,7 @@ class App extends Component {
     this.setState({showPersons: !doesShow});
   }
 
+  // gets called whenever a state change occurs.
   render() {
     const style = {
       backgroundColor: 'white',
@@ -50,6 +56,25 @@ class App extends Component {
       cursor: 'pointer'
     }
 
+    let persons = null;
+
+    // recommended way for return conditional list(s)
+    if (this.state.showPersons) {
+      persons = (
+        <div>
+          {this.state.persons.map((person, index) => {
+            return <Person
+              click={() => this.deletePersonHandler(index)}
+              name={person.name}
+              age={person.age}
+              key={person.id}
+              changed={(event) => this.nameChangedHandler(event, person.id)}
+            />
+          })}
+        </div>
+      );
+    }
+
     return (
       <div className="App">
         <h1>Hi, I'm a React App</h1>
@@ -57,30 +82,7 @@ class App extends Component {
         <button
           style={style} 
           onClick={this.togglePersonsHandler}>Toggle Persons</button>
-        { 
-          // ternary expression for showing persons
-          this.state.showPersons ?
-            <div>
-              <Person
-                name={this.state.persons[0].name}
-                age={this.state.persons[0].age}
-              />
-              <Person
-                name={this.state.persons[1].name}
-                age={this.state.persons[1].age}
-                // passing method as props so you can call a method that changes state, stateless components
-                // bind is better than the above ^^
-                click={this.switchNameHandler.bind(this, 'Amy!')}
-                changed={this.nameChangedHandler}
-              >
-                My Hobbies: Racing
-              </Person>
-              <Person
-                name={this.state.persons[2].name}
-                age={this.state.persons[2].age}
-              />
-            </div> : null
-        }
+        {persons}
       </div>
     );
     // return React.createElement('div', {className: 'App'}, React.createElement('h1', null, 'Does this work now?'));
