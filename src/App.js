@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import './App.css';
+import classes from './App.module.css';
 import Person from './Person/Person';
+
 
 class App extends Component {
   state = {
@@ -15,7 +16,7 @@ class App extends Component {
 
   nameChangedHandler = (event, id) => {
     const personIndex = this.state.persons.findIndex(p => {
-      return p.id == id;
+      return p.id === id;
     });
 
     // make copies, not references!
@@ -48,15 +49,8 @@ class App extends Component {
 
   // gets called whenever a state change occurs.
   render() {
-    const style = {
-      backgroundColor: 'white',
-      font: 'inherit',
-      border: '1px solid blue',
-      padding: '8px',
-      cursor: 'pointer'
-    }
-
     let persons = null;
+    let btnClass = '';
 
     // recommended way for return conditional list(s)
     if (this.state.showPersons) {
@@ -73,15 +67,25 @@ class App extends Component {
           })}
         </div>
       );
+      // change style dynamically
+      btnClass = classes.Red;
+    }
+
+    const assignedClasses = [];
+    if (this.state.persons.length <= 2) {
+      assignedClasses.push(classes.red); // classes = ['red']
+    }
+    if (this.state.persons.length <= 1) {
+      assignedClasses.push(classes.bold); // classes = ['red', 'bold']
     }
 
     return (
-      <div className="App">
+      <div className={classes.App}>
         <h1>Hi, I'm a React App</h1>
-        <p>This is really working!</p>
+        <p className={assignedClasses.join(' ')}>This is really working!</p>
         <button
-          style={style} 
-          onClick={this.togglePersonsHandler}>Toggle Persons</button>
+          className={btnClass} onClick={this.togglePersonsHandler}>Toggle Persons
+        </button>
         {persons}
       </div>
     );
