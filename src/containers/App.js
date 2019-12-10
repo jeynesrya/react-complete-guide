@@ -35,7 +35,7 @@ class App extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    console.log('[App.js] shoudlComponentUpdate');
+    console.log('[App.js] shouldComponentUpdate');
     return true;
   }
   componentDidUpdate() {
@@ -93,8 +93,9 @@ class App extends Component {
     return (
       <div className={classes.App}>
         <Cockpit 
-          showPersons={this.state.showPersons} 
-          persons={this.state.persons} 
+          showPersons={this.state.showPersons}
+          // now the cockpit won't re-render on every keystroke as persons length won't change 
+          personsLength={this.state.persons.length} 
           clicked={this.togglePersonsHandler} 
           title={this.props.appTitle} />
         {persons}
