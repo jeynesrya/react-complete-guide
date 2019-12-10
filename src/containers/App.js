@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import classes from './App.module.css';
 import Persons from '../components/Persons/Persons';
 import Cockpit from '../components/Cockpit/Cockpit';
+import Aux from '../hoc/Aux';
+import withClass from '../hoc/withClass';
+import AuthContext from '../context/auth-context';
 
 class App extends Component {
   constructor(props) {
@@ -17,7 +20,9 @@ class App extends Component {
       { id: '873ubidnidy9sdwkkl', name: 'Charlie', age: 26 }
     ],
     otherState: 'some other value',
-    showPersons: false
+    showPersons: false,
+    changeCounter: 0,
+    authenticated: false
   };
 
   static getDerivedStateFromProps(props, state) {
@@ -60,7 +65,13 @@ class App extends Component {
     const persons = [...this.state.persons];
     persons[personIndex] = person;
 
-    this.setState({persons: persons});
+    // guarantees the actual prevState
+    this.setState((prevState, props) =>  {
+      return {
+        persons: persons, 
+        changeCounter: prevState.changeCounter + 1
+      };
+    });
   }
 
   deletePersonHandler = (personIndex) => {
@@ -75,6 +86,10 @@ class App extends Component {
     this.setState({showPersons: !doesShow});
   }
 
+  loginHandler = () => {
+    this.setState({authenticated: true})
+  }
+
   // gets called whenever a state change occurs.
   render() {
     console.log('[App.js] render');
@@ -86,23 +101,30 @@ class App extends Component {
         <Persons 
           persons={this.state.persons}
           clicked={this.deletePersonHandler}
-          changed={this.nameChangedHandler} />
+          changed={this.nameChangedHandler} 
+          isAuthenticated={this.state.authenticated}/>
       );
     }
 
     return (
-      <div className={classes.App}>
-        <Cockpit 
-          showPersons={this.state.showPersons}
-          // now the cockpit won't re-render on every keystroke as persons length won't change 
-          personsLength={this.state.persons.length} 
-          clicked={this.togglePersonsHandler} 
-          title={this.props.appTitle} />
-        {persons}
-      </div>
+      <Aux>
+        <AuthContext.Provider value={{
+          authenticated: this.state.authenticated, 
+          login: this.loginHandler
+        }}>
+          <Cockpit 
+            showPersons={this.state.showPersons}
+            // now the cockpit won't re-render on every keystroke as persons length won't change 
+            personsLength={this.state.persons.length} 
+            clicked={this.togglePersonsHandler} 
+            title={this.props.appTitle} 
+          />
+          {persons}
+        </AuthContext.Provider>
+      </Aux>
     );
     // return React.createElement('div', {className: 'App'}, React.createElement('h1', null, 'Does this work now?'));
   }
 }
 
-export default App;
+export default withClass(App, classes.App);

@@ -1,16 +1,19 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 import classes from './Cockpit.module.css';
+import AuthContext from '../../context/auth-context';
 
 const Cockpit = (props) => {
+    const toggleBtnRef = useRef(null);
 
     // only runs the first time - mount
     useEffect(() => {
       console.log('[Cockput.js] useEffect');
       // Http request...
-      setTimeout(() => {
-        alert('Saved data to cloud start!');
-      }, 1000);
+      // setTimeout(() => {
+      //   alert('Saved data to cloud start!');
+      // }, 1000);
+      toggleBtnRef.current.click();
       // unmount
       return () => {
         //runs before main useEffect function but after the (first) render cycle
@@ -46,8 +49,12 @@ const Cockpit = (props) => {
             <h1>{props.title}</h1>
             <p className={assignedClasses.join(' ')}>This is really working!</p>
             <button
+                ref={toggleBtnRef}
                 className={btnClass} 
                 onClick={props.clicked}>Toggle Persons</button>
+            <AuthContext.Consumer>
+              {context => <button onClick={context.login}>Log in</button>}
+            </AuthContext.Consumer>
         </div>
     );
 };
